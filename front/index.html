@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <title>小米运动</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--图标-->
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+
+    <!--布局框架-->
+    <link rel="stylesheet" type="text/css" href="css/util.css">
+
+    <!--主要样式-->
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="css/xtiper.css">
+
+    <!-- jquery -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/scripts.js"></script>
+    <script src="js/xtiper.min.js"></script>
+</head>
+
+<body>
+
+    <div class="login">
+        <div class="container-login100">
+            <div class="wrap-login100 shuabox">
+
+                <form class="login100-form validate-form">
+                    <span class="login100-form-title">
+                        小米运动
+                    </span>
+
+                    <div class="wrap-input100 validate-input">
+                        <input id="phoneNum" class="input100" type="text" name="phoneNum" placeholder="小米运动账号（手机号）">
+                        <span class="focus-input100"></span>
+                        <span class="symbol-input100">
+                            <i class="fa fa-phone" aria-hidden="true"></i>
+                        </span>
+                    </div>
+
+                    <div class="wrap-input100 validate-input">
+                        <input id="password" class="input100" type="password" name="password" placeholder="输入密码">
+                        <span class="focus-input100"></span>
+                        <span class="symbol-input100">
+                            <i class="fa fa-lock" aria-hidden="true"></i>
+                        </span>
+                    </div>
+
+                    <div class="wrap-input100 validate-input">
+                        <input id="stepNum" class="input100" type="text" name="stepNum" placeholder="输入步数（小于100000）">
+                        <span class="focus-input100"></span>
+                        <span class="symbol-input100">
+                            <i class="fa fa-rocket" aria-hidden="true"></i>
+                        </span>
+                    </div>
+
+                    <div class="container-login100-form-btn">
+                        <button class="login100-form-btn" onclick="shuabuClick()" type="button">
+                            开始同步
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
