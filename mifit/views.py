@@ -10,9 +10,9 @@ class MifitView(View):
         account = request.POST.get('account')
         password = request.POST.get('password')
         steps = request.POST.get('steps')
-        ms = MiFit()
+        mf = MiFit(account, password, steps)
         try:
-            res = ms.login(account, password, steps)
+            res = mf.start()
         except Exception as e:
             return JsonResponse({'error': str(e), 'code': 0})
         return JsonResponse({'message': res, 'code': 1})

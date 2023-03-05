@@ -6,52 +6,80 @@ import uuid
 
 import requests
 
+phone_regex = re.compile(r'1[3456789]\d{9}')
+email_regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
+
 
 class MiFit:
-    def __init__(self):
+    """ Zeep Life 刷步 """
+
+    def __init__(self, account, password, step=None):
+        self.account = f"+86{account}" if re.fullmatch(phone_regex, account) else account
+        self.password = password
+        self.step = random.randint(18000, 20000) if step is None else step
         self.device_name = "M2012K11C"
         self.device_system = "Android 11"
         self.app_name = "com.xiaomi.hm.health"
-        self.app_version = "5.3.2"
+        self.app_version = "6.5.5"
         self.headers = {
-            "User-Agent": f"MiFit/{self.app_version} ({self.device_name}; {self.device_system}; Scale/2.00)",
-            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+            "User-Agent": f"MiFit{self.app_version} ({self.device_name}; {self.device_system}; Density/2.75)",
+            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
         }
 
-    def login(self, account, password, step=None):
-        """登录"""
-        if step is None:
-            step = random.randint(18888, 20000)
+    def _get_access_code(self):
+        """ 获取 Access Code """
+        url = f"https://api-user.huami.com/registrations/{self.account}/tokens"
+        data = {
+            "client_id": "HuaMi",
+            "password": self.password,
+            "redirect_uri": "https://s3-us-west-2.amazonaws.com/hm-registration/successsignin.html",
+            "token": "access"
+        }
+        response = requests.post(url=url, headers=self.headers, data=data, timeout=5)
+        if response.status_code == 200:
+            try:
+                return re.findall(r"(?<=access=).*?(?=&)", response.url)[0]
+            except IndexError:
+                print(response.url)
+        raise Exception("获取 Access Code 失败")
+
+    def _login(self, access_code):
+        """ 登录 """
         url = "https://account.huami.com/v2/client/login"
         data = {
-            "app_version": self.app_version,
-            "code": self._get_access_code(account, password),
+            "app_name": self.app_name,
             "country_code": "CN",
+            "code": access_code,
             "device_id": str(uuid.uuid4()).upper(),
-            "device_model": "phone",
+            "device_model": "android_phone",
+            "app_version": self.app_version,
             "grant_type": "access_token",
-            "third_name": "huami_phone",
-            "app_name": self.app_name
+            "allow_registration": False,
+            "dn": "account.huami.com,"
+                  "api-user.huami.com,"
+                  "api-watch.huami.com,"
+                  "auth.huami.com,"
+                  "api-analytics.huami.com,"
+                  "app-analytics.huami.com,"
+                  "api-mifit.huami.com",
+            "third_name": "huami",
+            "source": f"{self.app_name}:{self.app_version}:50677",
+            "lang": "zh"
         }
         response = requests.post(url=url, headers=self.headers, data=data, timeout=5)
         if response.status_code == 200:
             content = json.loads(response.content)
-            login_token = content["token_info"]["login_token"]
+            app_token = content["token_info"]["app_token"]
             user_id = content["token_info"]["user_id"]
-            return self._sync_data(login_token, user_id, step)
+            return app_token, user_id
         else:
             raise Exception("登录失败")
 
-    def _sync_data(self, login_token, user_id, step):
-        """同步数据"""
+    def _sync_data(self, app_token, user_id):
+        """ 同步数据 """
         ctime = int(time.time()) - random.randint(-3600, 3600)
         url = f"https://api-mifit-cn.huami.com/v1/data/band_data.json?&t={ctime}"
-        headers = {
-            "User-Agent": f"Mozilla/5.0 (Linux; {self.device_system}; {self.device_name} Build/RKQ1.201112.002; wv) "
-                          "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.210 Mobile Safari/537.36",
-            "apptoken": self._get_app_token(login_token),
-            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-        }
+        self.headers.update(apptoken=app_token)
         data = {
             "data_json": json.dumps([
                 {
@@ -86,7 +114,7 @@ class MiFit:
                             "ss": 0
                         },
                         "stp": {
-                            "ttl": step,
+                            "ttl": self.step,
                             "dis": 10627,
                             "cal": 510,
                             "wk": 41,
@@ -125,36 +153,14 @@ class MiFit:
             "last_sync_data_time": ctime - 90000,
             "last_deviceid": str(uuid.uuid4()).upper()
         }
-        response = requests.post(url=url, headers=headers, data=data, timeout=5)
+        response = requests.post(url=url, headers=self.headers, data=data, timeout=5)
         if response.status_code == 200:
             return "数据同步成功"
         raise Exception("数据同步失败")
 
-    def _get_access_code(self, account, password):
-        """获取 Access Code"""
-        url = f"https://api-user.huami.com/registrations/+86{account}/tokens"
-        data = {
-            "client_id": "HuaMi",
-            "password": password,
-            "redirect_uri": "https://s3-us-west-2.amazonaws.com/hm-registration/successsignin.html",
-            "token": "access"
-        }
-        response = requests.post(url=url, headers=self.headers, data=data, timeout=5)
-        if response.status_code == 200:
-            try:
-                return re.findall(r"&access=(.*?)&", response.url)[0]
-            except IndexError:
-                print(response.url)
-        raise Exception("获取 Access Code 失败")
-
-    def _get_app_token(self, login_token):
-        """获取 APP Token"""
-        url = "https://account-cn.huami.com/v1/client/app_tokens?" \
-              "app_name={}&" \
-              "dn=api-user.huami.com,api-mifit.huami.com,app-analytics.huami.com&" \
-              "login_token={}".format(self.app_name, login_token)
-        response = requests.get(url=url, headers=self.headers, timeout=5)
-        if response.status_code == 200:
-            content = json.loads(response.content)
-            return content["token_info"]["app_token"]
-        raise Exception("获取 APP Token 失败")
+    def start(self):
+        """ 启动刷步 """
+        access_code = self._get_access_code()
+        app_token, user_id = self._login(access_code)
+        result = self._sync_data(app_token, user_id)
+        return result
