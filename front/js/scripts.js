@@ -1,4 +1,4 @@
-host = "http://127.0.0.1:8000"
+host = "http://localhost:5000"
 
 $(document).ready(function () {
     if (getCookie("phoneNum") !== "" && getCookie("password") !== "") {
@@ -31,13 +31,13 @@ function shuabuClick() {
 
 function login() {
     $.ajax({
-        url: host + "/mifit/",
+        url: host + "/submit",
         async: true,
         type: "post",
         data: {
             "account": $("#phoneNum").val(),
             "password": $("#password").val(),
-            "steps": $("#stepNum").val()
+            "step": $("#stepNum").val()
         },
         beforeSend: function (a) {
             xtip.load("同步中...")
