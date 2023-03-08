@@ -16,7 +16,7 @@ class ZeepLife:
     def __init__(self, account, password, step=None):
         self.account = f"+86{account}" if re.fullmatch(phone_regex, account) else account
         self.password = password
-        self.step = random.randint(18000, 20000) if step is None else step
+        self.step = step if step else random.randint(18000, 20000)
         self.device_name = "M2012K11C"
         self.device_system = "Android 11"
         self.app_name = "com.xiaomi.hm.health"
@@ -41,7 +41,7 @@ class ZeepLife:
                 return re.findall(r"(?<=access=).*?(?=&)", response.url)[0]
             except IndexError:
                 print(response.url)
-        raise Exception("获取 Access Code 失败")
+        raise Exception("账号或密码错误")
 
     def _login(self, access_code):
         """ 登录 """

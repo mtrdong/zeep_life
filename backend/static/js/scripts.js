@@ -1,10 +1,11 @@
-host = "http://localhost:5000"
+var step = randomStep(18000, 20000)
 
 $(document).ready(function () {
-    if (getCookie("phoneNum") !== "" && getCookie("password") !== "") {
-        $("#phoneNum").val(getCookie("phoneNum"))
+    $('#step').attr('placeholder', step)
+    if (getCookie("account") !== "" && getCookie("password") !== "") {
+        $("#account").val(getCookie("account"))
         $("#password").val(getCookie("password"))
-        $("#stepNum").val(getCookie("stepNum"))
+        $("#step").val(getCookie("step"))
     }
 })
 
@@ -17,13 +18,14 @@ function getCookie(b) {
     }
 }
 
-function shuabuClick() {
-    if ($("#phoneNum").val() == "") {
+function submitStep() {
+    if ($("#step").val()) {
+		step = $("#step").val()
+	}
+    if ($("#account").val() == "") {
         xtip.alert("请输入账号", "e")
     } else if ($("#password").val() == "") {
 		xtip.alert("请输入密码", "e")
-	} else if ($("#stepNum").val() == "") {
-		xtip.alert("请输入步数", "e")
 	} else {
 		login()
 	}
@@ -31,13 +33,13 @@ function shuabuClick() {
 
 function login() {
     $.ajax({
-        url: host + "/submit",
+        url: "/submit",
         async: true,
         type: "post",
         data: {
-            "account": $("#phoneNum").val(),
+            "account": $("#account").val(),
             "password": $("#password").val(),
-            "step": $("#stepNum").val()
+            "step": step
         },
         beforeSend: function (a) {
             xtip.load("同步中...")
@@ -45,9 +47,9 @@ function login() {
         success: function (a) {
             xtip.closeAll()
             if (a.code === 1) {
-                setCookie("phoneNum", $("#phoneNum").val(), "d30")
+                setCookie("account", $("#account").val(), "d30")
                 setCookie("password", $("#password").val(), "d30")
-                setCookie("stepNum", $("#stepNum").val(), "d30")
+                setCookie("step", $("#step").val(), "d30")
                 xtip.alert(a.message, "s")
             } else {
                 xtip.alert(a.error, "e")
@@ -61,13 +63,13 @@ function login() {
 }
 
 function setCookie(a, c, d) {
-    var b = getsec(d)
+    var b = getSec(d)
     var e = new Date()
     e.setTime(e.getTime() + b * 1)
     document.cookie = a + "=" + escape(c) + ";expires=" + e.toGMTString()
 }
 
-function getsec(c) {
+function getSec(c) {
     var b = c.substring(1, c.length) * 1
     var a = c.substring(0, 1)
     if (a == "s") {
@@ -77,4 +79,20 @@ function getsec(c) {
     } else if (a == "d") {
         return b * 24 * 60 * 60 * 1000
     }
+}
+
+function randomStep(minStep, maxStep) {
+    return parseInt(Math.random() * (maxStep - minStep + 1) + minStep,10)
+}
+
+function help() {
+    layer.open({
+        title: "使用帮助",
+        content: "<div style='line-height: 32px'>" +
+            "1. 下载安装Zeep Life，并使用邮箱注册登录<br>" +
+            "2. 登录Zeep Life后，点击【我的 > 第三方接入】，然后绑定支付宝或微信<br>" +
+            "3. 打开刷步页面，输入账号、密码、步数，点击【开始同步】即可<br>" +
+            "4. 如果步数不同步，可尝试注销Zeep Life账号，重新注册登录，再重新绑定第三方APP" +
+            "</div>"
+    })
 }

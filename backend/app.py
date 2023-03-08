@@ -3,8 +3,13 @@ from flask_cors import CORS
 
 from backend.zeep_life import ZeepLife
 
-app = Flask('ZeepLife')
+app = Flask('Zeep Life')
 CORS(app, supports_credentials=True)
+
+
+@app.get('/')
+def index():
+    return app.send_static_file('index.html')
 
 
 @app.post('/submit')
@@ -21,4 +26,4 @@ def commit():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0')
