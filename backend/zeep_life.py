@@ -155,11 +155,14 @@ class ZeepLife:
         }
         response = requests.post(url=url, headers=self.headers, data=data, timeout=5)
         if response.status_code == 200:
-            return "数据同步成功"
-        raise Exception("数据同步失败")
+            return f"已提交步数：{self.step}"
+        raise Exception("同步失败")
 
     def start(self):
         """ 启动刷步 """
+        hour = time.strptime(time.ctime()).tm_hour
+        if not 7 <= hour <= 22:
+            raise Exception("当前时间不宜同步。建议同步时间：7:00 ~ 22:00")
         access_code = self._get_access_code()
         app_token, user_id = self._login(access_code)
         result = self._sync_data(app_token, user_id)

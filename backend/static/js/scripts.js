@@ -23,9 +23,9 @@ function submitStep() {
 		step = $("#step").val()
 	}
     if ($("#account").val() == "") {
-        xtip.alert("请输入账号", "e")
+        layer.alert("请输入账号", {icon: 2})
     } else if ($("#password").val() == "") {
-		xtip.alert("请输入密码", "e")
+		layer.alert("请输入密码", {icon: 2})
 	} else {
 		login()
 	}
@@ -42,22 +42,22 @@ function login() {
             "step": step
         },
         beforeSend: function (a) {
-            xtip.load("同步中...")
+            layer.load("同步中...")
         },
         success: function (a) {
-            xtip.closeAll()
+            layer.closeAll()
             if (a.code === 1) {
                 setCookie("account", $("#account").val(), "d30")
                 setCookie("password", $("#password").val(), "d30")
                 setCookie("step", $("#step").val(), "d30")
-                xtip.alert(a.message, "s")
+                layer.alert(a.message, {icon: 1})
             } else {
-                xtip.alert(a.error, "e")
+                layer.alert(a.error, {icon: 2})
             }
         },
         error: function (a) {
-            xtip.closeAll()
-            xtip.alert("服务似乎出现了点小问题", "e")
+            layer.closeAll()
+            layer.alert("服务似乎出现了点小问题", {icon: 5})
         }
     })
 }
@@ -86,13 +86,14 @@ function randomStep(minStep, maxStep) {
 }
 
 function help() {
-    layer.open({
-        title: "使用帮助",
-        content: "<div style='line-height: 32px'>" +
-            "1. 下载安装Zeep Life，并使用邮箱注册登录<br>" +
-            "2. 登录Zeep Life后，点击【我的 > 第三方接入】，然后绑定支付宝或微信<br>" +
-            "3. 打开刷步页面，输入账号、密码、步数，点击【开始同步】即可<br>" +
-            "4. 如果步数不同步，可尝试注销Zeep Life账号，重新注册登录，再重新绑定第三方APP" +
-            "</div>"
-    })
+    layer.alert(
+        "<div style='line-height: 32px'>" +
+        "1. 下载安装Zeep Life，并使用邮箱注册登录<br>" +
+        "2. 登录Zeep Life后，点击【我的 > 第三方接入】，然后绑定支付宝或微信<br>" +
+        "3. 打开刷步页面，输入账号、密码、步数，点击【开始同步】即可<br>" +
+        "4. 如果步数不同步，可尝试注销Zeep Life账号，重新注册登录，再重新绑定第三方APP<br>" +
+        "5. 注意，首次绑定需24小时后才会同步步数。另外，同步步数的时间建议在7~22点之间" +
+        "</div>",
+        {title: "使用帮助", btn: []}
+    )
 }
