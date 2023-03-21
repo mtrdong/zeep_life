@@ -23,9 +23,9 @@ function submitStep() {
 		step = $("#step").val()
 	}
     if ($("#account").val() == "") {
-        layer.alert("请输入账号", {icon: 2})
+        layer.alert("请输入账号", {icon: 2, skin: "layui-layer-radius"})
     } else if ($("#password").val() == "") {
-		layer.alert("请输入密码", {icon: 2})
+		layer.alert("请输入密码", {icon: 2, skin: "layui-layer-radius"})
 	} else {
 		login()
 	}
@@ -42,7 +42,7 @@ function login() {
             "step": step
         },
         beforeSend: function (a) {
-            layer.load("同步中...")
+            layer.load()
         },
         success: function (a) {
             layer.closeAll()
@@ -50,14 +50,14 @@ function login() {
                 setCookie("account", $("#account").val(), "d30")
                 setCookie("password", $("#password").val(), "d30")
                 setCookie("step", $("#step").val(), "d30")
-                layer.alert(a.message, {icon: 1})
+                layer.alert(a.message, {icon: 1, skin: "layui-layer-radius"})
             } else {
-                layer.alert(a.error, {icon: 2})
+                layer.alert(a.error, {icon: 2, skin: "layui-layer-radius"})
             }
         },
         error: function (a) {
             layer.closeAll()
-            layer.alert("服务似乎出现了点小问题", {icon: 5})
+            layer.alert("服务似乎出现了点小问题", {icon: 5, skin: "layui-layer-radius"})
         }
     })
 }
@@ -94,6 +94,6 @@ function help() {
         "4. 如果步数不同步，可尝试注销Zeep Life账号，重新注册登录，再重新绑定第三方APP<br>" +
         "5. 注意，首次绑定需24小时后才会同步步数。另外，同步步数的时间建议在7~22点之间" +
         "</div>",
-        {title: "使用帮助", btn: []}
+        {title: "使用帮助", btn: [], skin: "layui-layer-radius"}
     )
 }
