@@ -19,14 +19,7 @@ function getCookie(b) {
 }
 
 function submitStep() {
-    if ($("#step").val()) {
-		step = $("#step").val()
-	}
-    if ($("#account").val() == "") {
-        layer.alert("请输入账号", {icon: 2, skin: "layui-layer-radius"})
-    } else if ($("#password").val() == "") {
-		layer.alert("请输入密码", {icon: 2, skin: "layui-layer-radius"})
-	} else {
+    if (checkAccount() && checkPassword() && checkStep()) {
 		login()
 	}
 }
@@ -57,9 +50,46 @@ function login() {
         },
         error: function (a) {
             layer.closeAll()
-            layer.alert("服务似乎出现了点小问题", {icon: 5, skin: "layui-layer-radius"})
+            layer.alert("服务似乎出现了问题", {icon: 5, skin: "layui-layer-radius"})
         }
     })
+}
+
+function checkAccount() {
+    var account = $("#account").val()
+    if (!account) {
+        layer.alert("请输入账号", {icon: 2, skin: "layui-layer-radius"})
+        return false
+    }
+    var regex_phone = /^1[3456789]\d{9}$/
+    var regex_email = /^([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+$/
+    if (!(regex_phone.test(account) || regex_email.test(account))) {
+        layer.alert("账号格式错误", {icon: 2, skin: "layui-layer-radius"})
+        return false
+    }
+    return true
+}
+
+function checkPassword() {
+    var password = $("#password").val()
+    if (!password) {
+        layer.alert("请输入密码", {icon: 2, skin: "layui-layer-radius"})
+        return false
+    }
+    return true
+}
+
+function checkStep() {
+    var num = $("#step").val()
+    if (num) {
+        var regex_step = /^[1-9]\d*$/
+        if (!regex_step.test(num)) {
+            layer.alert("步数必须是正整数", {icon: 2, skin: "layui-layer-radius"})
+            return false
+        }
+        step = num
+    }
+    return true
 }
 
 function setCookie(a, c, d) {
@@ -72,11 +102,11 @@ function setCookie(a, c, d) {
 function getSec(c) {
     var b = c.substring(1, c.length) * 1
     var a = c.substring(0, 1)
-    if (a == "s") {
+    if (a === "s") {
         return b * 1000
-    } else if (a == "h") {
+    } else if (a === "h") {
         return b * 60 * 60 * 1000
-    } else if (a == "d") {
+    } else if (a === "d") {
         return b * 24 * 60 * 60 * 1000
     }
 }

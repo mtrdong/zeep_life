@@ -544,6 +544,7 @@ iframe {
   }
 }
 
+/* 新增帮助按钮 */
 .help-btn20 {
   width: 20px;
   height: 20px;
@@ -557,4 +558,16 @@ iframe {
 
 .help-btn20:hover {
   background-color: #ffa966;
+}
+
+/*
+自定义 layerui 弹窗及其内部按钮圆角样式。使用时通过 skin 属性指定：{skin: "layui-layer-radius"}
+通过 body 前缀，是为了确保自定义样式的优先级
+*/
+body .layui-layer-radius {
+  border-radius:10px
+}
+
+body .layui-layer-radius .layui-layer-btn a {
+  border-radius:5px
 }

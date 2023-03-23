@@ -6,8 +6,8 @@ import uuid
 
 import requests
 
-phone_regex = re.compile(r'1[3456789]\d{9}')
-email_regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
+phone_regex = re.compile(r'^1[3456789]\d{9}$')
+email_regex = re.compile(r'^([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+$')
 
 
 class ZeepLife:
